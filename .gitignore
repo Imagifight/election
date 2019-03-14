@@ -1,0 +1,7 @@
+/node_modules/*
+/src/app/assets/*
+/src/app/node_modules/*
+/.vscode/*
+/.vs/*
+/src/newciscoportal/*
+/src/event-horizon/*
