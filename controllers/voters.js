@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 //const bcrypt = require('bcrypt');
 //const saltRounds = 16;
 const cors = require('cors');
+var server = require('../server').server;
 
 router.use(bodyParser.urlencoded({
     extended: true
@@ -15,6 +16,16 @@ const voter = require('../models/voter');
 const candidate = require('../models/candidate');
 
 let locked_state = true;
+var lockid;
+
+var io = require('socket.io')(server);
+
+// io.on('connection', function (socket) {
+//     console.log('socket.io: connected');
+//     socket.on('disconnect', function(){
+//         console.log('socket.io: disconnected');
+//     });
+// });
 
 router.use(function (req, res, next) {
 
@@ -61,7 +72,7 @@ router.get('/:un?', (req, res) => {
         });
     } else {
         voter.get({
-            votername: uname
+            _id: uname
         }, (err, u) => {
             if (err) {
                 res.json({
@@ -131,48 +142,64 @@ router.get('/:un?', (req, res) => {
 //         res.json({ success: false, message: `No password!` });
 //     };
 // });
-router.post('/unlock/:v', (req, res) => {
-    if (locked_state) {
-        let v = req.params.v;
-        //let c = req.params.c;
-        let update = {
-            update: {
+router.get('/unlock/:v', (req, res) => {
+
+    voter.get({
+        _id: req.params.v
+    }, (err, vot) => {
+        var voted = vot.voted;
+        if (locked_state && !voted) {
+            lockid = req.params.v;
+            //let c = req.params.c;
+            let update = {
                 voted: -1
-            }
-        } //unlocked
-        (async function () {
-            console.log(`UPDATE ${id}\t${JSON.stringify(update)}`);
-            await user.edit({
-                _id: id
-            }, update, (err, updatedUser) => {
-                if (err) {
-                    res.json({
-                        success: false,
-                        message: `Failed to unlock. Error: ${err}\n ${update}`
-                    });
-                } else if (!updatedUser) {
-                    res.json({
-                        success: false,
-                        message: `Failed to unlock. Error: No user with id ${id}`
-                    });
-                } else {
-                    locked_state = false;
-                    res.json({
-                        success: true,
-                        user: updatedUser
-                    });
-                    res.end();
-                }
-            })
-        })().catch(err => {
-            throw err;
-        });
-    } else
-        res.json({
-            success: false,
-            message: `Failed to unlock. Error: already unlocked`
-        });
-})
+            }; //unlocked
+            (async function () {
+                console.log(`UPDATE ${lockid}\t${JSON.stringify(update)}\t${voted}`);
+                await voter.edit({
+                    _id: lockid
+                }, update, (err, updatedUser) => {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: `Failed to unlock. Error: ${err}\n ${update}`
+                        });
+                    } else if (!updatedUser) {
+                        res.json({
+                            success: false,
+                            message: `Failed to unlock. Error: No user with id ${id}`
+                        });
+                    } else {
+                        locked_state = false;
+                        lockid = req.params.v;
+                        io.sockets.on('connection', function (socket) {
+                            console.log(updatedUser);
+                            io.emit('unlock', {
+                                for: 'everyone'
+                            });
+                        });
+                        
+                        res.json({
+                            success: true,
+                            user: updatedUser
+                        });
+                        res.end();
+                        setTimeout(() => {
+                            locked_state = true;
+                        }, 10000);
+                    }
+                })
+            })().catch(err => {
+                throw err;
+            });
+        } else
+            res.json({
+                success: false,
+                message: `Failed to unlock. Error: already unlocked`
+            });
+    });
+});
+
 router.delete('/:id', (req, res) => {
     //access the parameter which is the id of the item to be deleted
     let id = req.params.id;

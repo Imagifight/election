@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 //const bcrypt = require('bcrypt');
 //const saltRounds = 16;
 
-//Define CandidateSchema with title, description and category
-const CandidateSchema = mongoose.Schema({
+//Define VoterSchema with title, description and category
+const VoterSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -21,29 +21,25 @@ const CandidateSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    position: {
-        type: String,
-        required: true
-    },
     voted: {
         type: Number,
         required: true
     }
 });
 
-const Candidate = module.exports = mongoose.model('Candidate', CandidateSchema, 'candidates');
+const Voter = module.exports = mongoose.model('Voter', VoterSchema, 'voters');
 
 module.exports.getAll = (callback) => {
-    Candidate.find(callback);
+    Voter.find(callback);
 }
 module.exports.get = (q, callback) => {
-    Candidate.findOne(q, callback);
+    Voter.findOne(q, callback);
 }
-// module.exports.register = (newCandidate, callback) => {
-//     newCandidate.save(callback);
+// module.exports.register = (newVoter, callback) => {
+//     newVoter.save(callback);
 // }
 module.exports.edit = (conditions, update, callback) => {
-    Candidate.findOneAndUpdate(conditions, update, {
+    Voter.findOneAndUpdate(conditions, update, {
         new: true
     }, callback);
 }
@@ -51,7 +47,7 @@ module.exports.delete = (id, callback) => {
     let query = {
         _id: id
     };
-    Candidate.deleteOne(query, callback);
+    Voter.deleteOne(query, callback);
 }
 // module.exports.auth = (username, password, callback) => {
 //     err = false;

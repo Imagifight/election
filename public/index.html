@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script>
+        var socket = io('localhost:8080');
+        socket.on('connect', function () {
+            socket.emit('message', 'Hello server');
+            socket.on('unlock', function (data) {
+                console.log(data, 'u');
+            });
+            socket.on('hello client', function (data) {
+                console.log("server emit");
+            });
+        });
+    </script>
+</body>
+
+</html>
