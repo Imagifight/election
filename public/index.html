@@ -12,6 +12,9 @@
             socket.on('unlock', function (data) {
                 console.log(data, 'u');
             });
+            socket.on('lock', function (data) {
+                console.log(data, 'l');
+            });
             socket.on('hello client', function (data) {
                 console.log("server emit");
             });

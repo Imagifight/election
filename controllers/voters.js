@@ -18,8 +18,6 @@ const candidate = require('../models/candidate');
 let locked_state = true;
 var lockid;
 
-var io = require('socket.io')(server);
-
 // io.on('connection', function (socket) {
 //     console.log('socket.io: connected');
 //     socket.on('disconnect', function(){
@@ -172,21 +170,18 @@ router.get('/unlock/:v', (req, res) => {
                     } else {
                         locked_state = false;
                         lockid = req.params.v;
-                        io.sockets.on('connection', function (socket) {
-                            console.log(updatedUser);
-                            io.emit('unlock', {
-                                for: 'everyone'
-                            });
+                        global.io.emit('unlock', {
+                            for: lockid
                         });
-                        
+
                         res.json({
                             success: true,
                             user: updatedUser
                         });
                         res.end();
-                        setTimeout(() => {
-                            locked_state = true;
-                        }, 10000);
+                        // setTimeout(() => {
+                        //     locked_state = true;
+                        // }, 60000);
                     }
                 })
             })().catch(err => {
@@ -196,6 +191,76 @@ router.get('/unlock/:v', (req, res) => {
             res.json({
                 success: false,
                 message: `Failed to unlock. Error: already unlocked`
+            });
+    });
+});
+
+router.get('/vote/:c', (req, res) => {
+    candidate.get({
+        _id: req.params.c
+    }, (err, cand) => {
+        if (!locked_state) {
+            let update = {
+                voted: 1
+            }; //voted
+            (async function () {
+                console.log(`VOTE ${lockid}\t${req.params.c}\t${cand}`);
+                await voter.edit({
+                    _id: lockid
+                }, update, (err, updatedUser) => {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: `Failed to record vote. Error: ${err}\n ${update}`
+                        });
+                    } else if (!updatedUser) {
+                        res.json({
+                            success: false,
+                            message: `Failed to record vote. Error: No user with id ${id}`
+                        });
+                    } else {
+                        console.log(cand.votes);
+                        (async function () {
+                            await candidate.edit({
+                                _id: req.params.c
+                            }, {
+                                votes: cand.votes + 1
+                            }, (err, updatedCand) => {
+                                if (err) {
+                                    res.json({
+                                        success: false,
+                                        message: `Failed to record vote. Error: ${err}\n ${update}`
+                                    });
+                                } else if (!updatedUser) {
+                                    res.json({
+                                        success: false,
+                                        message: `Failed to record vote. Error: No user with id ${id}`
+                                    });
+                                } else {
+                                    locked_state = true;
+                                    lockid = req.params.v;
+                                    global.io.emit('lock', {
+                                        for: lockid
+                                    });
+
+                                    res.json({
+                                        success: true,
+                                        user: updatedUser
+                                    });
+                                    res.end();
+                                }
+                            });
+                        })();
+                    }
+                });
+
+            })().catch(err => {
+                throw err;
+            });
+        } else
+            res.json({
+                success: false,
+                message: `Failed to vote. Error: locked`
             });
     });
 });

@@ -86,7 +86,7 @@ app.use(function (req, res, next) {
 var server = module.exports.serever = app.listen(port, host, () => {
     console.log(`Starting the server at ${host}:${port}`);
 });
-var io = require('socket.io')(server);
+var io = global.io = require('socket.io')(server);
 
 io.sockets.on('connection', function (socket) {
     console.log('socket.io: connected');
@@ -94,7 +94,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('socket.io: disconnected');
     });
-    socket.on('unlock', function (socket) {
+    socket.on('unlock', function () {
         console.log('socket.io: unlock');
     });
     socket.on('message', function (data) {
