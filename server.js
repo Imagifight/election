@@ -94,7 +94,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('socket.io: disconnected');
     });
-    socket.on('unlock', function () {
+    io.on('unlock', function () {
         console.log('socket.io: unlock');
     });
     socket.on('message', function (data) {

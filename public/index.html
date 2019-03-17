@@ -1,24 +1,86 @@
 <!DOCTYPE html>
 <html>
 
-<body>
+<head>
+    <title>Elections 2019</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- <link rel="stylesheet" href="assets/css/dash.css" /> -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+</head>
+
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
+    <!-- Uses a transparent header that draws on top of the layout's background -->
+    <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                </span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
+                <nav class="mdl-navigation">
+                    <span ng-model="voter.name"></span>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                        style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                </nav>
+            </div>
+        </header>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
     <script>
+
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+    <script>
+        var app = angular.module('event.horizon', ['ngMaterial', 'ngMessages', 'ngResource']);
         var socket = io('localhost:8080');
+        var _vid;
+
         socket.on('connect', function () {
             socket.emit('message', 'Hello server');
             socket.on('unlock', function (data) {
-                console.log(data, 'u');
+                _vid = data.for;
+                angular.element(document.getElementById('vote')).scope().init();
+                console.log('socket.io: unlock');
             });
             socket.on('lock', function (data) {
-                console.log(data, 'l');
+                console.log('socket.io: lock');
             });
             socket.on('hello client', function (data) {
                 console.log("server emit");
             });
         });
+        
+        app.config(['$mdIconProvider', function ($mdIconProvider) {
+                $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
+            }])
+            .config(function ($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('blue')
+                    .accentPalette('pink');
+                $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
+            })
+            .controller('vote', ($http, $scope) => {
+                $scope.init = () => {
+                    $http.get('http://lvh.me:8080/voter/' + String(_vid)).then((res) => {
+                        $scope.voter = res.data.user;
+                    })
+                }
+            });
     </script>
 </body>
 
