@@ -1,10 +1,10 @@
 //Require mongoose package
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const saltRounds = 16;
+//const bcrypt = require('bcrypt');
+//const saltRounds = 16;
 
-//Define UserSchema with title, description and category
-const UserSchema = mongoose.Schema({
+//Define CandidateSchema with title, description and category
+const CandidateSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -17,33 +17,41 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-   house: {
-       type: String,
-       required: true
-   },
-   position: {
-    type: String,
-    required: true
-   }
+    house: {
+        type: String,
+        required: true
+    },
+    position: {
+        type: String,
+        required: true
+    },
+    voted: {
+        type: Number,
+        required: true
+    }
 });
 
-const User = module.exports = mongoose.model('User', UserSchema, 'users');
+const Candidate = module.exports = mongoose.model('Candidate', CandidateSchema, 'candidates');
 
 module.exports.getAll = (callback) => {
-    User.find(callback);
+    Candidate.find(callback);
 }
 module.exports.get = (q, callback) => {
-    User.findOne(q, callback);
+    Candidate.findOne(q, callback);
 }
-module.exports.register = (newUser, callback) => {
-    newUser.save(callback);
-}
+// module.exports.register = (newCandidate, callback) => {
+//     newCandidate.save(callback);
+// }
 module.exports.edit = (conditions, update, callback) => {
-    User.findOneAndUpdate(conditions, update, { new: true }, callback);
+    Candidate.findOneAndUpdate(conditions, update, {
+        new: true
+    }, callback);
 }
 module.exports.delete = (id, callback) => {
-    let query = { _id: id };
-    User.deleteOne(query, callback);
+    let query = {
+        _id: id
+    };
+    Candidate.deleteOne(query, callback);
 }
 // module.exports.auth = (username, password, callback) => {
 //     err = false;
