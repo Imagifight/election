@@ -53,7 +53,7 @@
         socket.on('connect', function () {
             socket.emit('message', 'Hello server');
             socket.on('unlock', function (data) {
-                _vid = data.for;
+                _v = data.for;
                 angular.element(document.getElementById('vote')).scope().init();
                 console.log('socket.io: unlock');
             });
@@ -75,11 +75,6 @@
                 $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
             })
             .controller('vote', ($http, $scope) => {
-                $scope.init = () => {
-                    $http.get('http://lvh.me:8080/voter/' + String(_vid)).then((res) => {
-                        $scope.voter = res.data.user;
-                    })
-                }
             });
     </script>
 </body>

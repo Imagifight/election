@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Elections 2019</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- <link rel="stylesheet" href="assets/css/dash.css" /> -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+    <style>
+        .candidate {
+            width: 30vw;
+            position: relative;
+            right: 10vw;
+        }
+
+        .candidate>.mdl-card__title {
+            color: #fff;
+            height: 20vw;
+        }
+    </style>
+
+</head>
+
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
+    <!-- Uses a transparent header that draws on top of the layout's background -->
+    <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} | {{v.grade || 'grade'}}{{v.sec || 'sec'}}</code>
+                </span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
+                <nav class="mdl-navigation">
+                    <span ng-model="voter.name"></span>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                        style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                </nav>
+            </div>
+        </header>
+        <main style="margin:auto">
+            <h1>Prefect</h1>
+            <br>
+            <div class="mdl-grid">
+            <div ng-repeat="can in candidates">
+                <div class="mdl-cell mdl-cell--16-col" style="margin:auto;">
+                    <div class="mdl-card mdl-shadow--2dp candidate">
+                        <div class="mdl-card__title"
+                            style="background: url({{ '\'imgs/' + can._id + '.jpeg\''}}) center / cover;">
+                            <h2 class="mdl-card__title-text">{{can.name}}</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            {{can.meta.slogan}}
+                        </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <a class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect"
+                                ng-click="castVote($event, $index)">
+                                Vote
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+            </div>
+            <!-- <div class="mdl-cell mdl-cell--16-col">
+                <div class="mdl-card mdl-shadow--2dp candidate">
+                    <div class="mdl-card__title" style="height: 176px;">
+                        <h2 class="mdl-card__title-text">Niveditha S Iyer</h2>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+
+                    </div>
+                    <div class="mdl-card__actions mdl-card--border">
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                            ng-click="castVote($event, 1)">
+                            Vote
+                        </a>
+                    </div>
+                </div>
+            </div> -->
+            </div>
+        </main>
+        <style>
+            .mdl-layout__header {
+                background-color: {{color}};
+            }
+        </style>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+    <script>
+        var app = angular.module('electable', ['ngMaterial']);
+        var socket = io('localhost:8080');
+        var v, candidates, locked_state = false;
+
+        socket.on('connect', function () {
+            socket.emit('message', 'Hello server');
+            socket.on('unlock', function (data) {
+                v = data.v;
+                candidates = data.candidates
+                angular.element(document.getElementById('vote')).scope().init();
+                console.log('socket.io: unlock ', data);
+            });
+            socket.on('lock', function (data) {
+                console.log('socket.io: lock');
+            });
+            socket.on('hello client', function (data) {
+                console.log("hello client");
+            });
+        });
+
+        app.config(['$mdIconProvider', function ($mdIconProvider) {
+                $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
+            }])
+            .config(function ($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('blue')
+                    .accentPalette('pink');
+                $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
+            })
+            .controller('vote', ($http, $scope, $mdDialog) => {
+                $scope.init = () => {
+                    if (!locked_state)
+                        $http.get('http://lvh.me:8080/voter/').then(res => {
+                            console.log('init: ', res.data);
+                            $scope.candidates = res.data.candidates;
+                            $scope.v = v;
+                            switch(v.house) {
+                                case 'challengers': $scope.color = 'firebrick'; break;
+                                case 'explorers': $scope.color = 'rgb(138, 43, 226)'; break;
+                                case 'pioneers': $scope.color = 'rgb(255, 69, 0)'; break;
+                                case 'voyagers': $scope.color = 'rgb(0, 204, 255)'; break;
+                            }
+                        });
+                    else lock();
+                }
+                $scope.castVote = (ev, c) => {
+                    console.log(c);
+                    var confirm = $mdDialog.confirm()
+                        .title("Vote for " + $scope.candidates[c].name + "?")
+                        .textContent('You will not be able to change your choice.')
+                        .ariaLabel('Confirm')
+                        .targetEvent(ev)
+                        .ok('Confirm')
+                        .cancel('Cancel');
+
+                    $mdDialog.show(confirm).then(function () {
+                        $http.get('http://lvh.me:8080/voter/vote/' + $scope.candidates[c]._id).then(
+                            res => {
+                                if(res.data.success) {
+                                    $mdDialog.show(
+                                        $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector(
+                                            '#vote')))
+                                        .clickOutsideToClose(true)
+                                        .title('Your response has been recorded.')
+                                        .textContent(
+                                            'Thank you')
+                                        .ariaLabel('Recorded')
+                                        .ok('Got it!')
+                                        .targetEvent(ev)
+                                    );
+                                    lock();
+                                }
+                                else
+                                    $mdDialog.show(
+                                        $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector(
+                                            '#vote')))
+                                        .clickOutsideToClose(true)
+                                        .title('Your response has not been recorded.')
+                                        .textContent(
+                                            res.data.message)
+                                        .ariaLabel('Error')
+                                        .ok('Got it!')
+                                        .targetEvent(ev)
+                                    );
+                            })
+                        console.log(true);
+                    }, function () {
+                        console.log(false);
+                    });
+                };
+            });
+    </script>
+</body>
+
+</html>

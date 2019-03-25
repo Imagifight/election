@@ -60,12 +60,28 @@ router.get('/:un?', (req, res) => {
                     message: `Failed to load voters. Error: ${err}`
                 });
             } else {
-                res.json({
-                    success: true,
-                    voters: voters
+                candidate.getAll((err, candidates) => {
+                    if (err) throw err;
+                    res.json({
+                        success: true,
+                        voters: voters,
+                        candidates: candidates.map(obj => {
+                            return {
+                                //everything except votes
+                                _id: obj._id,
+                                name: obj.name,
+                                grade: obj.grade,
+                                sec: obj.sec,
+                                house: obj.house,
+                                position: obj.position,
+                                meta: obj.meta,
+                                metaList: obj.metaList
+                            };
+                        })
+                    });
+                    //res.write(JSON.stringify({success: true, voters:voters},null,2));
+                    res.end();
                 });
-                //res.write(JSON.stringify({success: true, voters:voters},null,2));
-                res.end();
             }
         });
     } else {
@@ -92,54 +108,7 @@ router.get('/:un?', (req, res) => {
         });
     }
 });
-// router.post('/auth', (req, res) => {
-//     username = req.body.username;
-//     password = req.body.password;
-//     var success, message;
-//     voter.auth(username, password, async function (s, m) {
-//         success = s;
-//         message = m;
-//         console.log('then', success, message);
-//         await res.json({ success: success, message: message });
-//     });
-// });
-// router.post('/new', (req, res) => {
-//     console.log(req.body.pass);
-//     if (req.body.pass) {
-//         bcrypt.hash(req.body.pass, 16, function (err, hash) {
-//             console.log(req.body.email);
-//             if (err) { throw (err); }
-//             if (/\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/.test(req.body.email)) {
-//                 bcrypt.compare(req.body.pass, hash, function (err, result) {
-//                     if (err) { throw (err); }
-//                     let newVoter = new voter({
-//                         name: req.body.name,
-//                         email: req.body.email,
-//                         pass: hash,
-//                         grade: req.body.grade,
-//                         sec: req.body.sec,
-//                         status: req.body.status,
-//                         username: req.body.username
-//                     });
-//                     console.log(`REG\t${newVoter}`);
-//                     voter.register(newvoter, (err, u) => {
-//                         if (err) {
-//                             res.json({ success: false, message: `Failed to create a new user. Error: ${err}\n ${newUser}` });
-//                         }
-//                         else
-//                             res.json({ success: true, message: "Added successfully." });
 
-//                     });
-//                 });
-//             }
-//             else {
-//                 res.json({ success: false, message: `Invalid email address.` });
-//             }
-//         })
-//     } else {
-//         res.json({ success: false, message: `No password!` });
-//     };
-// });
 router.get('/unlock/:v', (req, res) => {
 
     voter.get({
@@ -170,15 +139,29 @@ router.get('/unlock/:v', (req, res) => {
                     } else {
                         locked_state = false;
                         lockid = req.params.v;
-                        global.io.emit('unlock', {
-                            for: lockid
+                        candidate.getAll((err, candidates) => {
+                            if (err) throw err;
+                            global.io.emit('unlock', {
+                                v: vot,
+                                candidates: candidates.map(obj => {
+                                    return {
+                                        //everything except votes
+                                        name: obj.name,
+                                        grade: obj.grade,
+                                        sec: obj.sec,
+                                        house: obj.house,
+                                        position: obj.position,
+                                        meta: obj.meta,
+                                        metaList: obj.metaList
+                                    };
+                                })
+                            });
+                            res.json({
+                                success: true,
+                                user: updatedUser
+                            });
+                            res.end();
                         });
-
-                        res.json({
-                            success: true,
-                            user: updatedUser
-                        });
-                        res.end();
                         // setTimeout(() => {
                         //     locked_state = true;
                         // }, 60000);
@@ -238,7 +221,6 @@ router.get('/vote/:c', (req, res) => {
                                     });
                                 } else {
                                     locked_state = true;
-                                    lockid = req.params.v;
                                     global.io.emit('lock', {
                                         for: lockid
                                     });
