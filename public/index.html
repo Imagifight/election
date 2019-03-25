@@ -10,6 +10,32 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <!-- <link rel="stylesheet" href="assets/css/dash.css" /> -->
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+    <style>
+        .candidate {
+            width: 30vw;
+            position: relative;
+            right: 10vw;
+        }
+
+        .candidate>.mdl-card__title {
+            color: #fff;
+            height: 20vw;
+        }
+
+        #overlay {
+            background-image: linear-gradient(to bottom right, #00d9ff ,#320eff);
+            color: white;
+            z-index: 999;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            /*display: none;*/
+        }
+    </style>
+
 </head>
 
 <body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
@@ -19,7 +45,8 @@
             <div class="mdl-layout__header-row">
                 <!-- Title -->
                 <span class="mdl-layout-title">
-                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} |
+                        {{v.grade || 'grade'}}{{v.sec || 'sec'}}</code>
                 </span>
                 <!-- Add spacer, to align navigation to the right -->
                 <div class="mdl-layout-spacer"></div>
@@ -31,11 +58,59 @@
                 </nav>
             </div>
         </header>
+        <main style="margin:auto">
+            <h1>Prefect</h1>
+            <br>
+            <div class="mdl-grid">
+                <div ng-repeat="can in candidates">
+                    <div class="mdl-cell mdl-cell--16-col" style="margin:auto;">
+                        <div class="mdl-card mdl-shadow--2dp candidate">
+                            <div class="mdl-card__title"
+                                style="background: url({{ '\'imgs/' + can._id + '.jpeg\''}}) center / cover;">
+                                <h2 class="mdl-card__title-text">{{can.name}}</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                {{can.meta.slogan}}
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <a class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect"
+                                    ng-click="castVote($event, $index)">
+                                    Vote
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-cell mdl-cell--4-col"></div>
+                </div>
+                <!-- <div class="mdl-cell mdl-cell--16-col">
+                <div class="mdl-card mdl-shadow--2dp candidate">
+                    <div class="mdl-card__title" style="height: 176px;">
+                        <h2 class="mdl-card__title-text">Niveditha S Iyer</h2>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+
+                    </div>
+                    <div class="mdl-card__actions mdl-card--border">
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                            ng-click="castVote($event, 1)">
+                            Vote
+                        </a>
+                    </div>
+                </div>
+            </div> -->
+            </div>
+        </main>
+        <div id="overlay"><div><span style="position: absolute;top: 40%;left: 37%;font-size:600%;text-align:center;"><i class="material-icons" style="font-size:150%;" >lock</i> <span style="position: relative; bottom: 3vh;">locked</span></span></div></div>
+        <style>
+            .mdl-layout__header {
+                background-color: {{color}};
+            }
+        </style>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script>
 
     </script>
@@ -46,25 +121,32 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
     <script>
-        var app = angular.module('event.horizon', ['ngMaterial', 'ngMessages', 'ngResource']);
-        var socket = io('localhost:8080');
-        var _vid;
+        var app = angular.module('electable', ['ngMaterial']);
+        var socket = io('192.168.1.18:8080');
+        var v, candidates, locked_state = true;
 
         socket.on('connect', function () {
             socket.emit('message', 'Hello server');
             socket.on('unlock', function (data) {
-                _v = data.for;
+                locked_state = false;
+                v = data.v;
+                candidates = data.candidates
                 angular.element(document.getElementById('vote')).scope().init();
-                console.log('socket.io: unlock');
+                console.log('socket.io: unlock ', data);
+                document.getElementById('overlay').style.display = "none";
             });
             socket.on('lock', function (data) {
                 console.log('socket.io: lock');
+                lock();
             });
             socket.on('hello client', function (data) {
-                console.log("server emit");
+                console.log("hello client");
             });
         });
-        
+        function lock() {
+            document.getElementById('overlay').style.display = "block";
+            locked_state = true;
+        }
         app.config(['$mdIconProvider', function ($mdIconProvider) {
                 $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
             }])
@@ -74,7 +156,76 @@
                     .accentPalette('pink');
                 $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
             })
-            .controller('vote', ($http, $scope) => {
+            .controller('vote', ($http, $scope, $mdDialog) => {
+                $scope.init = () => {
+                    if (!locked_state)
+                        $http.get('http://lvh.me:8080/voter/').then(res => {
+                            console.log('init: ', res.data);
+                            $scope.candidates = res.data.candidates;
+                            $scope.v = v;
+                            switch (v.house) {
+                                case 'challengers':
+                                    $scope.color = 'firebrick';
+                                    break;
+                                case 'explorers':
+                                    $scope.color = 'rgb(138, 43, 226)';
+                                    break;
+                                case 'pioneers':
+                                    $scope.color = 'rgb(255, 69, 0)';
+                                    break;
+                                case 'voyagers':
+                                    $scope.color = 'rgb(0, 204, 255)';
+                                    break;
+                            }
+                        });
+                    else lock();
+                }
+                $scope.castVote = (ev, c) => {
+                    console.log(c);
+                    var confirm = $mdDialog.confirm()
+                        .title("Vote for " + $scope.candidates[c].name + "?")
+                        .textContent('You will not be able to change your choice.')
+                        .ariaLabel('Confirm')
+                        .targetEvent(ev)
+                        .ok('Confirm')
+                        .cancel('Cancel');
+
+                    $mdDialog.show(confirm).then(function () {
+                        $http.get('http://lvh.me:8080/voter/vote/' + $scope.candidates[c]._id).then(
+                            res => {
+                                 if (res.data.success) {
+                                //     $mdDialog.show(
+                                //         $mdDialog.alert()
+                                //         .parent(angular.element(document.querySelector(
+                                //             '#vote')))
+                                //         .clickOutsideToClose(true)
+                                //         .title('Your response has been recorded.')
+                                //         .textContent(
+                                //             'Thank you')
+                                //         .ariaLabel('Recorded')
+                                //         .ok('Got it!')
+                                //         .targetEvent(ev)
+                                //     );
+                                    lock();
+                                } else
+                                    $mdDialog.show(
+                                        $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector(
+                                            '#vote')))
+                                        .clickOutsideToClose(true)
+                                        .title('Your response has not been recorded.')
+                                        .textContent(
+                                            res.data.message)
+                                        .ariaLabel('Error')
+                                        .ok('Got it!')
+                                        .targetEvent(ev)
+                                    );
+                            })
+                        console.log(true);
+                    }, function () {
+                        console.log(false);
+                    });
+                };
             });
     </script>
 </body>
