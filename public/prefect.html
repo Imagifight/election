@@ -192,19 +192,19 @@
                     $mdDialog.show(confirm).then(function () {
                         $http.get('http://lvh.me:8080/voter/vote/' + $scope.candidates[c]._id).then(
                             res => {
-                                if (res.data.success) {
-                                    $mdDialog.show(
-                                        $mdDialog.alert()
-                                        .parent(angular.element(document.querySelector(
-                                            '#vote')))
-                                        .clickOutsideToClose(true)
-                                        .title('Your response has been recorded.')
-                                        .textContent(
-                                            'Thank you')
-                                        .ariaLabel('Recorded')
-                                        .ok('Got it!')
-                                        .targetEvent(ev)
-                                    );
+                                // if (res.data.success) {
+                                //     $mdDialog.show(
+                                //         $mdDialog.alert()
+                                //         .parent(angular.element(document.querySelector(
+                                //             '#vote')))
+                                //         .clickOutsideToClose(true)
+                                //         .title('Your response has been recorded.')
+                                //         .textContent(
+                                //             'Thank you')
+                                //         .ariaLabel('Recorded')
+                                //         .ok('Got it!')
+                                //         .targetEvent(ev)
+                                //     );
                                     lock();
                                 } else
                                     $mdDialog.show(
