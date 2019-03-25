@@ -21,6 +21,19 @@
             color: #fff;
             height: 20vw;
         }
+
+        #overlay {
+            background-image: linear-gradient(to bottom right, #00d9ff ,#320eff);
+            color: white;
+            z-index: 999;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            /*display: none;*/
+        }
     </style>
 
 </head>
@@ -32,7 +45,8 @@
             <div class="mdl-layout__header-row">
                 <!-- Title -->
                 <span class="mdl-layout-title">
-                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} | {{v.grade || 'grade'}}{{v.sec || 'sec'}}</code>
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} |
+                        {{v.grade || 'grade'}}{{v.sec || 'sec'}}</code>
                 </span>
                 <!-- Add spacer, to align navigation to the right -->
                 <div class="mdl-layout-spacer"></div>
@@ -48,27 +62,27 @@
             <h1>Prefect</h1>
             <br>
             <div class="mdl-grid">
-            <div ng-repeat="can in candidates">
-                <div class="mdl-cell mdl-cell--16-col" style="margin:auto;">
-                    <div class="mdl-card mdl-shadow--2dp candidate">
-                        <div class="mdl-card__title"
-                            style="background: url({{ '\'imgs/' + can._id + '.jpeg\''}}) center / cover;">
-                            <h2 class="mdl-card__title-text">{{can.name}}</h2>
-                        </div>
-                        <div class="mdl-card__supporting-text">
-                            {{can.meta.slogan}}
-                        </div>
-                        <div class="mdl-card__actions mdl-card--border">
-                            <a class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect"
-                                ng-click="castVote($event, $index)">
-                                Vote
-                            </a>
+                <div ng-repeat="can in candidates">
+                    <div class="mdl-cell mdl-cell--16-col" style="margin:auto;">
+                        <div class="mdl-card mdl-shadow--2dp candidate">
+                            <div class="mdl-card__title"
+                                style="background: url({{ '\'imgs/' + can._id + '.jpeg\''}}) center / cover;">
+                                <h2 class="mdl-card__title-text">{{can.name}}</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                {{can.meta.slogan}}
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border">
+                                <a class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect"
+                                    ng-click="castVote($event, $index)">
+                                    Vote
+                                </a>
+                            </div>
                         </div>
                     </div>
+                    <div class="mdl-cell mdl-cell--4-col"></div>
                 </div>
-                <div class="mdl-cell mdl-cell--4-col"></div>
-            </div>
-            <!-- <div class="mdl-cell mdl-cell--16-col">
+                <!-- <div class="mdl-cell mdl-cell--16-col">
                 <div class="mdl-card mdl-shadow--2dp candidate">
                     <div class="mdl-card__title" style="height: 176px;">
                         <h2 class="mdl-card__title-text">Niveditha S Iyer</h2>
@@ -86,6 +100,7 @@
             </div> -->
             </div>
         </main>
+        <div id="overlay"><div><span style="position: absolute;top: 40%;left: 37%;font-size:600%;text-align:center;"><i class="material-icons" style="font-size:150%;" >lock</i> <span style="position: relative; bottom: 3vh;">locked</span></span></div></div>
         <style>
             .mdl-layout__header {
                 background-color: {{color}};
@@ -108,15 +123,17 @@
     <script>
         var app = angular.module('electable', ['ngMaterial']);
         var socket = io('localhost:8080');
-        var v, candidates, locked_state = false;
+        var v, candidates, locked_state = true;
 
         socket.on('connect', function () {
             socket.emit('message', 'Hello server');
             socket.on('unlock', function (data) {
+                locked_state = false;
                 v = data.v;
                 candidates = data.candidates
                 angular.element(document.getElementById('vote')).scope().init();
                 console.log('socket.io: unlock ', data);
+                document.getElementById('overlay').style.display = "none";
             });
             socket.on('lock', function (data) {
                 console.log('socket.io: lock');
@@ -125,7 +142,10 @@
                 console.log("hello client");
             });
         });
-
+        function lock() {
+            document.getElementById('overlay').style.display = "block";
+            locked_state = true;
+        }
         app.config(['$mdIconProvider', function ($mdIconProvider) {
                 $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
             }])
@@ -142,11 +162,19 @@
                             console.log('init: ', res.data);
                             $scope.candidates = res.data.candidates;
                             $scope.v = v;
-                            switch(v.house) {
-                                case 'challengers': $scope.color = 'firebrick'; break;
-                                case 'explorers': $scope.color = 'rgb(138, 43, 226)'; break;
-                                case 'pioneers': $scope.color = 'rgb(255, 69, 0)'; break;
-                                case 'voyagers': $scope.color = 'rgb(0, 204, 255)'; break;
+                            switch (v.house) {
+                                case 'challengers':
+                                    $scope.color = 'firebrick';
+                                    break;
+                                case 'explorers':
+                                    $scope.color = 'rgb(138, 43, 226)';
+                                    break;
+                                case 'pioneers':
+                                    $scope.color = 'rgb(255, 69, 0)';
+                                    break;
+                                case 'voyagers':
+                                    $scope.color = 'rgb(0, 204, 255)';
+                                    break;
                             }
                         });
                     else lock();
@@ -164,7 +192,7 @@
                     $mdDialog.show(confirm).then(function () {
                         $http.get('http://lvh.me:8080/voter/vote/' + $scope.candidates[c]._id).then(
                             res => {
-                                if(res.data.success) {
+                                if (res.data.success) {
                                     $mdDialog.show(
                                         $mdDialog.alert()
                                         .parent(angular.element(document.querySelector(
@@ -178,8 +206,7 @@
                                         .targetEvent(ev)
                                     );
                                     lock();
-                                }
-                                else
+                                } else
                                     $mdDialog.show(
                                         $mdDialog.alert()
                                         .parent(angular.element(document.querySelector(
