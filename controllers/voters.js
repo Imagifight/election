@@ -122,7 +122,7 @@ router.get('/unlock/:v', (req, res) => {
                 voted: -1
             }; //unlocked
             (async function () {
-                console.log(`UPDATE ${lockid}\t${JSON.stringify(update)}\t${voted}`);
+                console.log(`UNLOCK ${lockid}`);
                 await voter.edit({
                     _id: lockid
                 }, update, (err, updatedUser) => {
