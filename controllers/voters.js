@@ -187,7 +187,7 @@ router.get('/vote/:c', (req, res) => {
                 voted: 1
             }; //voted
             (async function () {
-                console.log(`VOTE ${lockid}\t${req.params.c}\t${cand}`);
+                console.log(`VOTE ${lockid}`);
                 await voter.edit({
                     _id: lockid
                 }, update, (err, updatedUser) => {
