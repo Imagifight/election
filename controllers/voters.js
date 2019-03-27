@@ -48,6 +48,16 @@ router.use(cors({
     origin: '*'
 }));
 
+router.get('/tally/', (req, res) => {
+    candidate.getAll((err, c) => {
+        if (err) throw err;
+        res.json({
+            success: true,
+            candidates: c
+        });
+    });
+});
+
 router.get('/:un?', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     let uname = req.params.un;

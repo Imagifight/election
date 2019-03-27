@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Result</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/icon.css">
+    <script defer src="assets/js/material.min.js"></script>
+    <link rel="stylesheet" href="assets/css/angular-material.min.css">
+    <link rel="stylesheet" href="assets/css/material.indigo-pink.min.css" />
+</head>
+
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
+    <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                </span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
+                <nav class="mdl-navigation">
+                    <span ng-model="voter.name"></span>
+                </nav>
+            </div>
+        </header>
+        <main style="margin:auto">
+            <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col"><h4>Votes</h4><br<br></div>
+                <div class="mdl-cell mdl-cell--12-col" ng-repeat="can in candidates">
+                    <h3>{{can.name}}</h3>
+                    <h2>{{can.votes}}</h2>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="assets/js/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+    <script src="assets/js/angularjs/angular.min.js"></script>
+    <script src="assets/js/angularjs/angular-animate.min.js"></script>
+    <script src="assets/js/angularjs/angular-aria.min.js"></script>
+    <script src="assets/js/angularjs/angular-messages.min.js"></script>
+    <script src="assets/js/angularjs/angular-resource.js"></script>
+    <script src="assets/js/angularjs/angular-material.min.js"></script>
+    <script>
+        var app = angular.module('electable', ['ngMaterial']);
+
+        app.config(['$mdIconProvider', function ($mdIconProvider) {
+                $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
+            }])
+            .config(function ($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('blue')
+                    .accentPalette('pink');
+                $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
+            })
+            .controller('vote', ($http, $scope, $mdDialog) => {
+                $scope.init = () => {
+                    $http.get('http://lvh.me:8080/voter/tally').then(res => {
+                        $scope.candidates = res.data.candidates;
+                    });
+                }
+            });
+    </script>
+</body>
+
+</html>
