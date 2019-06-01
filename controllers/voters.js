@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 //const bcrypt = require('bcrypt');
 //const saltRounds = 16;
 const cors = require('cors');
-var server = require('../server').server;
+//var server = require('../server').server;
 
 router.use(bodyParser.urlencoded({
     extended: true
@@ -26,20 +26,15 @@ var lockid;
 // });
 
 router.use(function (req, res, next) {
-
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
-
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
     // Request headers you wish to allow
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-
     // Set to true if you need the website to include cookies in the requests sent
     // to the API (e.g. in case you use sessions)
     res.setHeader('Access-Control-Allow-Credentials', false);
-
     // Pass to next layer of middleware
     next();
 });
@@ -212,7 +207,6 @@ router.get('/vote/:c', (req, res) => {
                             message: `Failed to record vote. Error: No user with id ${id}`
                         });
                     } else {
-                        console.log(cand.votes);
                         (async function () {
                             await candidate.edit({
                                 _id: req.params.c

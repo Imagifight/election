@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="APP">
+
+<head>
+    <meta charset="UTF-8">
+    <title>angular file upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../assets/css/icon.css">
+    <script defer src="../assets/js/material.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/angular-material.min.css">
+    <link rel="stylesheet" href="../assets/css/material.indigo-pink.min.css" />
+    <style>
+        md-content {
+            height: 100%
+        }
+
+        b {
+            font-size: 130%;
+        }
+    </style>
+
+</head>
+
+<body ng-app="electable" ng-init="init()" ng-controller="creator as ctr" id="vote">
+    <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
+        <header class="mdl-layout__header" style="background-color: rgb(223, 16, 16)">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                </span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
+                <nav class="mdl-navigation">
+                    <span ng-model="voter.name"></span>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                                        style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                </nav>
+            </div>
+        </header>
+        <main style="margin: auto;">
+            <br><br>
+            <h2>Add Candidates</h2>
+            <form method='post' action='/candidates/upload' enctype="multipart/form-data" name="cform">
+                <b>Name: </b>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+
+                    <input class="mdl-textfield__input" type="text" id="name" name="name">
+                    <label class="mdl-textfield__label" for="name">Name</label>
+                </div><br>
+                <b>Position: </b>
+                <select name="position" id="position">
+                    <option value="Captain">Captain</option>
+                    <option value="Prefect">Prefect</option>
+                </select>
+
+                <br>
+                <b>Grade: </b>
+
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="grade"
+                        name="grade" size=2 maxlength=2>
+                    <label class="mdl-textfield__label" for="grade">Grade</label>
+                    <span class="mdl-textfield__error">Input is not a number!</span>
+                </div>
+
+                <br>
+                <b>Section: </b>
+                <select name="sec" id="sec">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                </select>
+
+                <br><br>
+                <b>House: </b>
+                <select name="house" id="House">
+                    <option value="Challengers">Challengers</option>
+                    <option value="Explorers">Explorers</option>
+                    <option value="Pioneers">Pioneers</option>
+                    <option value="Voyagers">Voyagers</option>
+                </select>
+
+                <br><br>
+                Photo: <input type="file" name="fileUploaded">
+                <br><br>
+                <input type="submit" value="Submit">
+                    <!-- Submit
+                </button> -->
+            </form>
+        </main>
+    </div>
+</body>
+
+<!-- <md-card>
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Account Preferences</span>
+                    <span class="md-subhead">Tell us a little about you.</span>
+                </md-card-title-text>
+            </md-card-title>
+
+            <md-card-content>
+                <div layout="row">
+                    <md-input-container>
+                        <label>Name</label>
+                        <input name="name">
+                    </md-input-container>
+
+                    <md-input-container>
+                        <label>Position</label>
+                        <input name="position">
+                    </md-input-container>
+
+                    <md-input-container>
+                        <label>State</label>
+                        <md-select ng-model="ctr.userState">
+                            <md-option><em>None</em></md-option>
+                            <md-option ng-repeat="state in ctrl.states" ng-value="state.abbrev"
+                                ng-disabled="$index === 1">
+                                {{state.abbrev}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </md-card-content>
+        </md-card>
+        
+        <input type='file' name='fileUploaded'>
+        <input type='submit'>
+    </form>
+
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="../assets/js/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+    <script src="../assets/js/angularjs/angular.min.js"></script>
+    <script src="../assets/js/angularjs/angular-animate.min.js"></script>
+    <script src="../assets/js/angularjs/angular-aria.min.js"></script>
+    <script src="../assets/js/angularjs/angular-messages.min.js"></script>
+    <script src="../assets/js/angularjs/angular-resource.js"></script>
+    <script src="../assets/js/angularjs/angular-material.min.js"></script>
+
+    <script>
+        var app = angular.module('electable', ['ngMaterial', 'ngMessages', 'material.svgAssetsCache']);
+        var socket = io();
+        var locked_state = true;
+
+        socket.on('connect', function () {
+            socket.emit('message', 'Hello server');
+            socket.on('hello client', function (data) {
+                console.log("hello client");
+            });
+            socket.on('lock', () => {
+                angular.element(document.getElementById('vote')).scope().init();
+            });
+            socket.on('unlock', () => {
+                angular.element(document.getElementById('vote')).scope().init();
+            });
+        });
+
+        app.config(['$mdIconProvider', function ($mdIconProvider) {
+                $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
+            }])
+            .config(function ($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('blue')
+                    .accentPalette('pink');
+                $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
+            })
+            .controller('vote', ($http, $scope, $mdDialog) => {
+                $scope.init = () => {
+                    console.log('test')
+                }
+            });
+    </script> -->
+</body>
+
+</html>

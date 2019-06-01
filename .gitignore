@@ -1,7 +1,6 @@
 /node_modules/*
-/src/app/assets/*
-/src/app/node_modules/*
+/public/asstes/*
 /.vscode/*
 /.vs/*
-/src/newciscoportal/*
-/src/event-horizon/*
+/public/imgs/*
+/csv/*

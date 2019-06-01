@@ -42,6 +42,9 @@ module.exports.edit = (conditions, update, callback) => {
         new: true
     }, callback);
 }
+module.exports.register = (newUser, callback) => {
+    newUser.save(callback);
+}
 module.exports.delete = (id, callback) => {
     let query = {
         _id: id

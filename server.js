@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 
 const voters = require('./controllers/voters');
+const candidates = require('./controllers/candidates')
 const config = require('./config/config');
 
 mongoose.connect(config.database, {
@@ -18,6 +19,7 @@ const app = module.exports = express();
 //var io = require('socket.io')(http);
 
 app.use('/voter', voters);
+app.use('/candidates', candidates);
 
 const port = config.port;
 const host = config.host;
@@ -34,37 +36,13 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-/*express.static is a built in middleware function to serve static files.
- We are telling express server public folder is the place to look for the static files
-*/
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-app.use(function (req, res, next) {
-    var publicdir = __dirname + 'public';
-    if (req.path.indexOf('.') === -1) {
-        if (req.path.indexOf('?') === -1) {
-            var file = publicdir + req.path + '.html';
-            fs.exists(file, function (exists) {
-                if (exists)
-                    req.url += '.html';
-                next();
-            });
-        } else {
-            var file = publicdir + req.path.substring(0, req.path.indexOf('?')) + '.html'
-            fs.exists(file, function (exists) {
-                if (exists)
-                    req.url = req.url.substring(0, req.path.indexOf('?')) + '.html' + req.path.substring(req.path.indexOf('?'));
-                console.log(req.url);
-                next();
-            });
-        }
-    } else
-        next();
-});
+app.use(express.static(path.join(__dirname, 'public'), {
+    index: false,
+    extensions: ['html']
+}));
 
 app.get('/', (req, res) => {
-    res.send("<code>Routes:</code><code>\\user</code>");
+    res.sendFile(path.resolve("./public/index.html"));
 });
 
 // Add headers

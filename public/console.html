@@ -103,19 +103,19 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+    <script src="assets/js/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+    <script src="assets/js/angularjs/angular.min.js"></script>
+    <script src="assets/js/angularjs/angular-animate.min.js"></script>
+    <script src="assets/js/angularjs/angular-aria.min.js"></script>
+    <script src="assets/js/angularjs/angular-messages.min.js"></script>
+    <script src="assets/js/angularjs/angular-resource.js"></script>
+    <script src="assets/js/angularjs/angular-material.min.js"></script>
 
     <script>
         var app = angular.module('electable', ['ngMaterial']);
-        var socket = io('localhost:8080');
+        var socket = io();
         var locked_state = true;
 
         socket.on('connect', function () {
@@ -125,10 +125,10 @@
             });
             socket.on('lock', () => {
                 angular.element(document.getElementById('vote')).scope().init();
-            })
+            });
             socket.on('unlock', () => {
                 angular.element(document.getElementById('vote')).scope().init();
-            })
+            });
         });
 
         app.config(['$mdIconProvider', function ($mdIconProvider) {
@@ -144,7 +144,7 @@
                 $scope.grade = 12;
                 $scope.sec = 'a';
                 $scope.init = () => {
-                    $http.get('http://lvh.me:8080/voter/').then(res => {
+                    $http.get('/voter/').then(res => {
                         $scope.candidates = res.data.candidates;
                         $scope.class_list = search(search(res.data.voters, 'grade',  parseInt($scope.grade)),
                             'sec', $scope.sec).sort((a, b) => a.name < b.name ? -1 : 1);
@@ -153,7 +153,7 @@
                 }
 
                 $scope.unlock = id => {
-                    $http.get('http://lvh.me:8080/voter/unlock/' + id).then(res => {
+                    $http.get('/voter/unlock/' + id).then(res => {
                         if(!res.data.success) console.log(res.data.message);
                     });
                 }

@@ -37,6 +37,7 @@
             </div>
         </main>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="assets/js/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 
@@ -48,7 +49,14 @@
     <script src="assets/js/angularjs/angular-material.min.js"></script>
     <script>
         var app = angular.module('electable', ['ngMaterial']);
+        var socket = io();
 
+        socket.on('connect', function () {
+            socket.emit('message', 'Hello server');
+            socket.on('lock', () => {
+                angular.element(document.getElementById('vote')).scope().init();
+            });
+        });
         app.config(['$mdIconProvider', function ($mdIconProvider) {
                 $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
             }])
@@ -60,7 +68,7 @@
             })
             .controller('vote', ($http, $scope, $mdDialog) => {
                 $scope.init = () => {
-                    $http.get('http://lvh.me:8080/voter/tally').then(res => {
+                    $http.get('/voter/tally').then(res => {
                         $scope.candidates = res.data.candidates;
                     });
                 }
