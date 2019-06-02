@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Control</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/icon.css">
+    <script defer src="assets/js/material.min.js"></script>
+    <link rel="stylesheet" href="assets/css/angular-material.min.css">
+    <link rel="stylesheet" href="assets/css/material.indigo-pink.min.css" />
+    <style>
+        footer {
+            position: fixed;
+            left: 0vw;
+            bottom: 0;
+            width: 100vw;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            /* text-align: center; */
+            opacity: 1.0;
+            /* font-size: 75%; */
+            z-index: 9999999;
+        }
+
+        main code {
+            background-color: #aaa;
+
+        }
+
+        .mdl-textfield {
+            width: 7vw;
+        }
+    </style>
+</head>
+
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
+    <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
+        <header class="mdl-layout__header" style="background-color: aqua">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                </span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
+                <nav class="mdl-navigation">
+                    <span ng-model="voter.name"></span>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                                style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                </nav>
+            </div>
+        </header>
+        <main style="margin-left: 10vw; margin-right: 10vw;">
+            <br><br>
+            <h1>Operations Manual</h1>
+            <hr>
+            <h2>1. Server setup</h2>
+            <h3>Install Server</h3>
+            <p>
+                In the desired directory, run <code>git clone https://github.com/Imagifight/election</code>.<br>
+                This will copy the required files into the directory <i>election</i>. <br>
+                Within <i>election</i>, run <code>npm i</code> and wait for installation to complete. <br>
+            </p>
+            <p>
+                Start MongoDB at <a href="localhost:27017">localhost:27017</a>. Create database <code>elect</code> with
+                collections <code>voters</code> and <code>candidates</code>. <br>
+                Create a CSV file for the voters with fields name, grade, sec, house called <i>voters.csv</i> and place
+                it in the folder <i>csv</i>. Execute the Python script <i>CSVtoJSON.voters.py</i>.<br>
+                The voters have been inserted into the database.
+            </p>
+            <h3>Start Sever</h3>
+            <p>
+                Run <code>npm start</code> in the root directory (elections). Wait for the console to display
+                <code>Starting the server at 0.0.0.0:8080</code>.<br>
+                In a browser open <a href="localhost:8080/candidates/upload">localhost:8080/candidates/upload</a> and
+                fill in the form to add candidates. Repeat as many times as required. <br>
+                <br><i>Note: currently only accepts .jpg files.</i>
+            </p>
+            <h2>2. Connect Terminal</h2>
+            <p>On the host computer run <code>ipconfig</code> and get the host IP address. On the computer used for
+                collecting votes, type in <i>ip_address:8080</i> in a browser where ip_address is the host IP. <br>
+                Ensure the screen reads <i class="material-icons" style="font-size:150%;">lock</i>
+                <span>locked</span><br>
+                On the host computer open <a href="localhost:8080/console">localhost:8080/console</a> and select the
+                required class. Elections may now begin.
+            </p>
+            <h3>3. Results</h3>
+            <p>
+                After voting ends, open <a href="localhost:8080/tally">localhost:8080/tally</a> to see results. <br>
+                Clear the MongoDB database.
+            </p>
+            <br><br>
+        </main>
+    </div>
+    <footer>
+        <span style="position: relative;left: 10vh;">Coded with &hearts; by <a
+                href="http://www.instagram.com/romir.k">romir.k</a></span>
+    </footer>
+</body>
+
+</html>

@@ -53,15 +53,22 @@
                 <div style="float:left">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                         <input class="mdl-textfield__input" type="text" pattern="[1-9][0,1,2]{0,1}" ng-model='grade'
-                            size=2 maxlength=2 id='g'>
+                            size=2 maxlength=2 id='g' name='g'>
                         <label class="mdl-textfield__label" for="g">Grade</label>
                         <span class="mdl-textfield__error">Grades 1-12</span>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input" type="text" id="s" pattern='[a-c]' ng-model='sec'>
+                        <input class="mdl-textfield__input" type="text" id="s" pattern='[a-c]' ng-model='sec' name='s'>
                         <label class="mdl-textfield__label" for="s">Section</label>
                         <span class="mdl-textfield__error">a/b/c</span>
                     </div>
+                    <select name="house" id="House" ng-model="house">
+                        <option value="all">All</option>
+                        <option value="challengers">Challengers</option>
+                        <option value="explorers">Explorers</option>
+                        <option value="pioneers">Pioneers</option>
+                        <option value="voyagers">Voyagers</option>
+                    </select>
                 </div>
 
 
@@ -86,9 +93,10 @@
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
                                     ng-switch-when="1" disabled><i class="material-icons">lock</i> Voted</button>
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-                                    ng-switch-when="-1" disabled><i class="material-icons">lock</i> Voting</button>
+                                    ng-switch-when="-1" disabled  style="color: red"><i class="material-icons">lock</i> Voting</button>
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-                                    ng-switch-when="0" ng-click="unlock(v._id)"><i class="material-icons">lock_open</i> unlock</button>
+                                    ng-switch-when="0" ng-click="unlock(v._id)"><i class="material-icons">lock_open</i>
+                                    unlock</button>
                             </span>
                         </td>
                     </tr>
@@ -103,8 +111,8 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="assets/js/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="assets/js/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
 
     <script src="assets/js/angularjs/angular.min.js"></script>
     <script src="assets/js/angularjs/angular-animate.min.js"></script>
@@ -143,18 +151,23 @@
             .controller('vote', ($http, $scope, $mdDialog) => {
                 $scope.grade = 12;
                 $scope.sec = 'a';
+                $scope.house = "all";
                 $scope.init = () => {
                     $http.get('/voter/').then(res => {
                         $scope.candidates = res.data.candidates;
-                        $scope.class_list = search(search(res.data.voters, 'grade',  parseInt($scope.grade)),
-                            'sec', $scope.sec).sort((a, b) => a.name < b.name ? -1 : 1);
-                            console.log(res.data.voters, $scope.class_list, $scope.grade, $scope.sec);
+                        $scope.class_list = 
+                            ($scope.house == 'all' ? 
+                                search(search(res.data.voters, 'grade', parseInt($scope.grade)),'sec', $scope.sec)
+                                :
+                                search(search(search(res.data.voters, 'grade', parseInt($scope.grade)),'sec', $scope.sec), 'house', $scope.house)
+                            ).sort((a, b) => a.name < b.name ? -1 : 1);
+                        console.log(res.data.voters, $scope.class_list, $scope.grade, $scope.sec);
                     });
                 }
 
                 $scope.unlock = id => {
                     $http.get('/voter/unlock/' + id).then(res => {
-                        if(!res.data.success) console.log(res.data.message);
+                        if (!res.data.success) console.log(res.data.message);
                     });
                 }
             });
