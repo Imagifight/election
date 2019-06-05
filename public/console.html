@@ -168,6 +168,7 @@
                 $scope.init = () => {
                     $http.get('/voter/').then(res => {
                         $scope.candidates = res.data.candidates;
+                        if(!$scope.candidates.length) $scope.add();
                         $scope.class_list =
                             ($scope.house == 'all' ?
                                 search(search(res.data.voters, 'grade', parseInt($scope.grade)), 'sec',
