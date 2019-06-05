@@ -29,7 +29,7 @@
     </style>
 </head>
 
-<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote" ng-cloak>
     <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
         <header class="mdl-layout__header" style="background-color: limegreen">
             <div class="mdl-layout__header-row">
@@ -41,24 +41,30 @@
                 <div class="mdl-layout-spacer"></div>
                 <!-- Navigation -->
                 <nav class="mdl-navigation">
-                    <span ng-model="voter.name"></span>
-                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
-                                style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                    <a class="mdl-navigation__link" href="./help">Help</a>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                        style="background-color: #032539" ng-click="add()">Add Candidates</button>
                 </nav>
             </div>
         </header>
         <main style="margin: auto;">
             <br><br>
+            <h3>Voter List</h3>
+            <b>Candidates contesting for {{candidates[0].position}}:</b> <span
+                ng-repeat="c in candidates">{{c.name}}<span ng-if="$index + 1 == candidates.length"><br></span><span
+                    ng-if="$index + 1 != candidates.length">, </span></span>
+
             <div>
                 <div style="float:left">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                         <input class="mdl-textfield__input" type="text" pattern="[1-9][0,1,2]{0,1}" ng-model='grade'
-                            size=2 maxlength=2 id='g' name='g'>
+                            value=12 size=2 maxlength=2 id='g' name='g'>
                         <label class="mdl-textfield__label" for="g">Grade</label>
                         <span class="mdl-textfield__error">Grades 1-12</span>
                     </div>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input" type="text" id="s" pattern='[a-c]' ng-model='sec' name='s'>
+                        <input class="mdl-textfield__input" type="text" id="s" pattern='[a-c]' ng-model='sec' name='s'
+                            value=a>
                         <label class="mdl-textfield__label" for="s">Section</label>
                         <span class="mdl-textfield__error">a/b/c</span>
                     </div>
@@ -93,12 +99,19 @@
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
                                     ng-switch-when="1" disabled><i class="material-icons">lock</i> Voted</button>
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
-                                    ng-switch-when="-1" disabled  style="color: red"><i class="material-icons">lock</i> Voting</button>
+                                    ng-switch-when="-1" disabled style="color: red"><i class="material-icons">lock</i>
+                                    Voting</button>
                                 <button class="mdl-button mdl-js-button mdl-button--colored mdl-js-ripple-effect"
                                     ng-switch-when="0" ng-click="unlock(v._id)"><i class="material-icons">lock_open</i>
                                     unlock</button>
                             </span>
                         </td>
+                    </tr>
+                    <tr ng-if="!class_list.length">
+                        <td>-</td>
+                        <td>NO STUDENTS</td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
                 </tbody>
             </table>
@@ -155,13 +168,13 @@
                 $scope.init = () => {
                     $http.get('/voter/').then(res => {
                         $scope.candidates = res.data.candidates;
-                        $scope.class_list = 
-                            ($scope.house == 'all' ? 
-                                search(search(res.data.voters, 'grade', parseInt($scope.grade)),'sec', $scope.sec)
-                                :
-                                search(search(search(res.data.voters, 'grade', parseInt($scope.grade)),'sec', $scope.sec), 'house', $scope.house)
+                        $scope.class_list =
+                            ($scope.house == 'all' ?
+                                search(search(res.data.voters, 'grade', parseInt($scope.grade)), 'sec',
+                                    $scope.sec) :
+                                search(search(search(res.data.voters, 'grade', parseInt($scope.grade)),
+                                    'sec', $scope.sec), 'house', $scope.house)
                             ).sort((a, b) => a.name < b.name ? -1 : 1);
-                        console.log(res.data.voters, $scope.class_list, $scope.grade, $scope.sec);
                     });
                 }
 
@@ -170,6 +183,7 @@
                         if (!res.data.success) console.log(res.data.message);
                     });
                 }
+                $scope.add = () => window.location.replace('/candidates/upload');
             });
 
         function search(arr, prop, val) {

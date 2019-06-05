@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Control</title>
+    <title>Help</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/icon.css">
@@ -24,7 +24,7 @@
         }
 
         main code {
-            background-color: #aaa;
+            background-color: rgb(114, 206, 235);
 
         }
 
@@ -36,19 +36,19 @@
 
 <body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
     <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
-        <header class="mdl-layout__header" style="background-color: aqua">
+        <header class="mdl-layout__header" style="background-color: gold">
             <div class="mdl-layout__header-row">
                 <!-- Title -->
                 <span class="mdl-layout-title">
-                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>electable</code>
+                    <code style='color:rgba(0, 0, 0, 0.87);background-color:inherit;font-size: 110%;'>electable</code>
                 </span>
                 <!-- Add spacer, to align navigation to the right -->
                 <div class="mdl-layout-spacer"></div>
                 <!-- Navigation -->
                 <nav class="mdl-navigation">
                     <span ng-model="voter.name"></span>
-                    <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
-                                style="background-color: #032539" ng-click="logOut()">Log out</button> -->
+                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                                style="background-color: #032539" onclick="window.location.replace('./console')">Return to console</button>
                 </nav>
             </div>
         </header>
@@ -66,15 +66,15 @@
             <p>
                 Start MongoDB at <a href="localhost:27017">localhost:27017</a>. Create database <code>elect</code> with
                 collections <code>voters</code> and <code>candidates</code>. <br>
-                Create a CSV file for the voters with fields name, grade, sec, house called <i>voters.csv</i> and place
+                Create a CSV file for the voters with fields name, grade, sec, house (in that order <i>only</i>) called <i>voters.csv</i> and place
                 it in the folder <i>csv</i>. Execute the Python script <i>CSVtoJSON.voters.py</i>.<br>
                 The voters have been inserted into the database.
             </p>
             <h3>Start Sever</h3>
             <p>
-                Run <code>npm start</code> in the root directory (elections). Wait for the console to display
+                Run <code>npm start</code> in the root directory (election). Wait for the console to display
                 <code>Starting the server at 0.0.0.0:8080</code>.<br>
-                In a browser open <a href="localhost:8080/candidates/upload">localhost:8080/candidates/upload</a> and
+                In a browser open <a href="localhost:8080/console">localhost:8080/console</a>. Click on 'Add Candidates' and
                 fill in the form to add candidates. Repeat as many times as required. <br>
                 <br><i>Note: currently only accepts .jpg files.</i>
             </p>
