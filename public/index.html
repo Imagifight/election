@@ -31,6 +31,7 @@
             width: 100%;
             height: 100%;
             margin: 0 auto;
+            /*display: none;*/
         }
 
         footer {
@@ -40,7 +41,9 @@
             width: 100vw;
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
+            /* text-align: center; */
             opacity: 1.0;
+            /* font-size: 75%; */
             z-index: 998;
         }
     </style>
@@ -51,11 +54,14 @@
     <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
         <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
+                <!-- Title -->
                 <span class="mdl-layout-title">
                     <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} |
                         {{v.grade || 'grade'}} {{v.sec.toUpperCase() || 'sec'}}</code>
                 </span>
+                <!-- Add spacer, to align navigation to the right -->
                 <div class="mdl-layout-spacer"></div>
+                <!-- Navigation -->
                 <nav class="mdl-navigation">
                     <span ng-model="voter.name"></span>
                 </nav>
@@ -141,7 +147,6 @@
             document.getElementById('overlay').style.display = "block";
             locked_state = true;
         }
-
         app.config(['$mdIconProvider', function ($mdIconProvider) {
                 $mdIconProvider.icon('md-toggle-arrow', 'img/icons/toggle-arrow.svg', 48);
             }])
