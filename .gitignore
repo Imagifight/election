@@ -6,3 +6,6 @@
 /csv/*
 /data/*
 Grade11NameList.csv
+setup.cpp
+CSVtoJSON.voters.py
+*.bat
