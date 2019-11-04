@@ -9,3 +9,4 @@ Grade11NameList.csv
 setup.cpp
 CSVtoJSON.voters.py
 *.bat
+*.sed
