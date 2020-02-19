@@ -1,3 +1,24 @@
+/*
+    Copyright (C) 2020  Romir Kulshrestha <romir.kulshrestha@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    Designed and built for NPS Koramangala.
+
+    View full source at https://github.com/romirk/election
+*/
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -62,7 +83,7 @@ app.use(function (req, res, next) {
 
 //Listen to port 8080
 var server = module.exports.serever = app.listen(port, host, () => {
-    console.log(`Starting the server at ${host}:${port}`);
+    console.log(`Starting the server at ${host}:${port}\n`);
 });
 var io = global.io = require('socket.io')(server);
 

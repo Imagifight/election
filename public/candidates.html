@@ -47,17 +47,18 @@
 
 </head>
 
-<body>
+<body ng-app="electable" ng-init="init()" ng-controller="vote" id="vote">
     <div class="layout-transparent mdl-layout mdl-js-layout wrapper">
-        <header class="mdl-layout__header">
+        <header class="mdl-layout__header" style="background-color: maroon">
             <div class="mdl-layout__header-row">
                 <span class="mdl-layout-title">
-                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>{{v.name || 'voter.name'}} |
-                        {{v.grade || 'grade'}} {{v.sec.toUpperCase() || 'sec'}}</code>
+                    <code style='color:inherit;background-color:inherit;font-size: 110%;'>candidates</code>
                 </span>
                 <div class="mdl-layout-spacer"></div>
                 <nav class="mdl-navigation">
-                    <span ng-model="voter.name"></span>
+                    <a class="mdl-navigation__link" href="console">Back</a>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
+                        style="background-color: #032539" ng-click="add()">Add Candidates</button>
                 </nav>
             </div>
         </header>
@@ -65,20 +66,24 @@
             <h1>{{candidates[0].position}}</h1>
             <br>
             <div class="mdl-grid">
+                <div ng-if="!candidates.length">
+                    <h3>No candidates exist in database.</h3>
+                    <h4>Click on add candidates to get started.</h4>
+                </div>
                 <div ng-repeat="can in candidates">
                     <div class="mdl-cell mdl-cell--16-col" style="margin:auto;">
                         <div class="mdl-card mdl-shadow--2dp candidate">
                             <div class="mdl-card__title"
-                                style="background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.2)), url({{ '\'imgs/' + can._id + '.jpeg\''}}) top / cover;">
+                                style="background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.2)), url({{ '\'imgs/' + can._id + '.' + can.meta + '\''}}) top / cover;">
                                 <h2 class="mdl-card__title-text">{{can.name}}</h2>
                             </div>
-                            <div class="mdl-card__supporting-text">
+                            <!-- <div class="mdl-card__supporting-text">
                                 {{can.meta.slogan}}
-                            </div>
+                            </div> -->
                             <div class="mdl-card__actions mdl-card--border">
                                 <a class="mdl-button mdl-button--colored mdl-button--raised mdl-js-button mdl-js-ripple-effect"
-                                    ng-click="castVote($event, $index)">
-                                    Vote
+                                    ng-click="del($event, $index)" style="background-color: red">
+                                    DELETE
                                 </a>
                             </div>
                         </div>
@@ -91,11 +96,11 @@
             <span style="position: relative;left: 10vh;">Coded with &hearts; by <a
                     href="https://github.com/romirk">romir.k</a></span>
         </footer>
-        <div id="overlay">
+        <!-- <div id="overlay">
             <div><span style="position: absolute;top: 40%;left: 37%;font-size:600%;text-align:center;"><i
                         class="material-icons" style="font-size:150%;">lock</i> <span
                         style="position: relative; bottom: 3vh;">locked</span></span></div>
-        </div>
+        </div> -->
         <style>
             .mdl-layout__header {
                 background-color: {{color}};
@@ -116,7 +121,7 @@
     <script>
         var app = angular.module('electable', ['ngMaterial']);
         var socket = io();
-        var v, candidates, locked_state = true;
+        var v, candidates, locked_state = false;
 
         socket.on('connect', function () {
             socket.emit('message', 'Hello server');
@@ -152,52 +157,62 @@
                 $mdThemingProvider.theme('dark-blue').backgroundPalette('blue').dark();
             })
             .controller('vote', ($http, $scope, $mdDialog) => {
+                $scope.date = new Date();
+                $scope.add = () => window.location.replace('/candidates/upload');
                 $scope.init = () => {
                     if (!locked_state)
                         $http.get('/voter').then(res => {
                             $scope.candidates = res.data.candidates;
                             $scope.v = v;
-                            switch (v.house) {
-                                case 'challengers':
-                                    $scope.color = 'firebrick';
-                                    break;
-                                case 'explorers':
-                                    $scope.color = 'rgb(138, 43, 226)';
-                                    break;
-                                case 'pioneers':
-                                    $scope.color = 'rgb(255, 69, 0)';
-                                    break;
-                                case 'voyagers':
-                                    $scope.color = 'rgb(0, 204, 255)';
-                                    break;
-                            }
+                            // switch (v.house) {
+                            //     case 'challengers':
+                            //         $scope.color = 'firebrick';
+                            //         break;
+                            //     case 'explorers':
+                            //         $scope.color = 'rgb(138, 43, 226)';
+                            //         break;
+                            //     case 'pioneers':
+                            //         $scope.color = 'rgb(255, 69, 0)';
+                            //         break;
+                            //     case 'voyagers':
+                            //         $scope.color = 'rgb(0, 204, 255)';
+                            //         break;
+                            // }
                         });
                     else lock();
                 }
-
-                $scope.date = new Date();
-
-                $scope.castVote = (ev, c) => {
+                $scope.del = (ev, c) => {
                     var confirm = $mdDialog.confirm()
-                        .title("Vote for " + $scope.candidates[c].name + "?")
-                        .textContent('You will not be able to change your choice.')
+                        .title("Remove " + $scope.candidates[c].name + "?")
+                        .textContent('This cannot be undone.')
                         .ariaLabel('Confirm')
                         .targetEvent(ev)
                         .ok('Confirm')
                         .cancel('Cancel');
 
                     $mdDialog.show(confirm).then(function () {
-                        $http.get('/voter/vote/' + $scope.candidates[c]._id).then(
+                        $http.delete('/candidates/' + $scope.candidates[c]._id).then(
                             res => {
                                 if (res.data.success) {
-                                    lock();
+                                    $mdDialog.show(
+                                        $mdDialog.alert()
+                                        .parent(angular.element(document.querySelector(
+                                            '#vote')))
+                                        .clickOutsideToClose(true)
+                                        .title('Deleted succesfully')
+                                        .textContent(
+                                            res.data.message)
+                                        .ariaLabel('Error')
+                                        .ok('Got it!')
+                                        .targetEvent(ev)
+                                    ).then(() => window.location.reload());
                                 } else
                                     $mdDialog.show(
                                         $mdDialog.alert()
                                         .parent(angular.element(document.querySelector(
                                             '#vote')))
                                         .clickOutsideToClose(true)
-                                        .title('Your response has not been recorded.')
+                                        .title('Failed')
                                         .textContent(
                                             res.data.message)
                                         .ariaLabel('Error')

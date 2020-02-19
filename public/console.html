@@ -43,7 +43,7 @@
                 <nav class="mdl-navigation">
                     <a class="mdl-navigation__link" href="./help">Help</a>
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored"
-                        style="background-color: #032539" ng-click="add()">Add Candidates</button>
+                        style="background-color: #032539" ng-click="add()">Candidates</button>
                 </nav>
             </div>
         </header>
@@ -119,7 +119,7 @@
         </main>
         <footer>
             <span style="position: relative;left: 10vh;">Coded with &hearts; by <a
-                    href="http://www.instagram.com/romir.k">romir.k</a></span>
+                    href="https://github.com/romirk">romir.k</a></span>
         </footer>
     </div>
 
@@ -168,7 +168,7 @@
                 $scope.init = () => {
                     $http.get('/voter/').then(res => {
                         $scope.candidates = res.data.candidates;
-                        if(!$scope.candidates.length) $scope.add();
+                        if(!$scope.candidates.length) $scope.add(); //sneaky!
                         $scope.class_list =
                             ($scope.house == 'all' ?
                                 search(search(res.data.voters, 'grade', parseInt($scope.grade)), 'sec',
@@ -184,7 +184,7 @@
                         if (!res.data.success) console.log(res.data.message);
                     });
                 }
-                $scope.add = () => window.location.replace('/candidates/upload');
+                $scope.add = () => window.location.assign('/candidates');
             });
 
         function search(arr, prop, val) {

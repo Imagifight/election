@@ -1,9 +1,9 @@
 {
   "name": "electable",
-  "version": "1.7.1",
+  "version": "1.8.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Imagifight/election.git"
+    "url": "https://github.com/romirk/election.git"
   },
   "description": "",
   "main": "server.js",

@@ -42,6 +42,7 @@ router.post('/upload', (req, res, next) => {
 
     form.parse(req, function (err, fields, files) {
         fields.votes = 0;
+        fields.meta = files.fileUploaded.name.split('.')[1];
         let newCandidate = new candidate(fields);
         candidate.register(newCandidate, (err, c) => {
             if (err)
@@ -60,7 +61,7 @@ router.post('/upload', (req, res, next) => {
             fs.rename(files.fileUploaded.path, './public/imgs/' + String(c._id) + '.' + files.fileUploaded.name.split('.')[1], function (err) {
                 if (err)
                     throw err;
-                console.log('renamed complete',  String(c._id) + files.fileUploaded.name.split('.')[1]);
+                console.log('renamed complete', String(c._id) + '.' + files.fileUploaded.name.split('.')[1]);
                 res.end("<script>window.location.replace('http://localhost:8080/console')</script>");
                 // res.end(JSON.stringify({
                 //     success: true,
@@ -76,5 +77,32 @@ router.post('/upload', (req, res, next) => {
 
     });
 });
+router.delete('/:id', (req, res) => {
+    //access the parameter which is the id of the item to be deleted
+    let id = req.params.id;
+    console.log(`DELETE\t${id}`);
+    //Call the model method delete
+    candidate.delete(id, (err, u) => {
+        if (err) {
+            res.json({ success: false, message: `Failed to delete the user. Error: ${err}` });
+        }
+        else if (u) {
+            fs.stat('./public/imgs/' + String(id) + '.jpeg', function (err, stats) {
+                console.log(stats);//here we got all information of file in stats variable
 
+                if (err) {
+                    return console.error(err);
+                }
+
+                fs.unlink('./public/imgs/' + String(id) + '.jpeg', function (err) {
+                    if (err) return console.log(err);
+                    console.log('file deleted successfully');
+                });
+            });
+            res.json({ success: true, message: "Deleted successfully" });
+        }
+        else
+            res.json({ success: false });
+    })
+});
 module.exports = router;

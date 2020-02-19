@@ -1,5 +1,5 @@
 /node_modules/*
-/public/asstes/*
+/public/assets/*
 /.vscode/*
 /.vs/*
 /public/imgs/*
@@ -7,6 +7,5 @@
 /data/*
 Grade11NameList.csv
 setup.cpp
-CSVtoJSON.voters.py
 *.bat
 *.sed
