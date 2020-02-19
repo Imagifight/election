@@ -8,7 +8,7 @@ from tkinter import *
 root = Tk()
 root.withdraw()
 messagebox.showinfo("Electable Installer", "Electable (c) 2019 Romir Kulshrestha\n<romir.kulshrestha@gmail.com>\n\nThe use of this software is governed by the MIT License. For more information, see license.txt.")
-if not messagebox.askokcancel("Electable Installer | MongoDB", "This software requires MongoDB to be installed. If MongoDB is not installed, click 'Cancel' below and install MongoDB before proceeding with the installation."):
+if not messagebox.askokcancel("Electable Installer | MongoDB", "This software requires NodeJS and MongoDB to be installed. If they are not installed, click 'Cancel' below and install them before proceeding."):
     exit(0)
 messagebox.showinfo("Electable Installer | MongoDB", "Please select the location of MongoDB (mongod.exe).")
 root.mongodir =  filedialog.askdirectory()
