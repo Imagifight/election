@@ -15,7 +15,7 @@
     "name": "Romir K",
     "email": "romir.kulshrestha@gmail.com"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",

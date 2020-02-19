@@ -1,13 +1,14 @@
 from urllib.request import urlopen
 from zipfile import ZipFile
 from os import remove
-from subprocess import run
+from subprocess import Popen
 from tkinter import filedialog, messagebox
 from tkinter import *
 
 root = Tk()
 root.withdraw()
-if not messagebox.askokcancel("Electable Installer", "Electable (c) 2019 Romir Kulshrestha\n<romir.kulshrestha@gmail.com>\n\nThis software is governed by the MIT License. For more information, see license.txt."):
+messagebox.showinfo("Electable Installer", "Electable (c) 2019 Romir Kulshrestha\n<romir.kulshrestha@gmail.com>\n\nThe use of this software is governed by the MIT License. For more information, see license.txt.")
+if not messagebox.askokcancel("Electable Installer | MongoDB", "This software requires MongoDB to be installed. If MongoDB is not installed, click 'Cancel' below and install MongoDB before proceeding with the installation."):
     exit(0)
 messagebox.showinfo("Electable Installer | MongoDB", "Please select the location of MongoDB (mongod.exe).")
 root.mongodir =  filedialog.askdirectory()
@@ -16,7 +17,7 @@ messagebox.showinfo("Electable Installer | Installation directory", "Please sele
 root.installdir =  filedialog.askdirectory()
 print("Root: ", root.installdir)
 
-dist = 'https://github.com/Imagifight/election/blob/master/dist/electable.zip?raw=true'
+dist = 'https://github.com/romirk/election/blob/master/dist/electable.zip?raw=true'
 print("Downloading...")
 tmp  = open(root.installdir + '/electable.zip', 'wb+')
 zipcontents = urlopen(dist).read()
@@ -47,8 +48,11 @@ start """ + root.mongodir + """/mongod.exe --dbpath=""" + root.installdir + """/
 start npm start
 
 exit""")
-#run(["start", root.installdir + '/install.bat'])
+
 s.close()
+
+p = Popen("install.bat", cwd=root.installdir)
+stdout, stderr = p.communicate()
 
 print("\tdone.")
 messagebox.showinfo("Electable Installer | Complete", "Installation completed successfully.")
