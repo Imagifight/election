@@ -24,7 +24,7 @@
     "fs": "0.0.1-security",
     "fs-extra": "^8.0.1",
     "jsonwebtoken": "^8.3.0",
-    "mongoose": "^5.2.2",
+    "mongoose": "^5.7.5",
     "socket.io": "^2.2.0"
   }
 }
